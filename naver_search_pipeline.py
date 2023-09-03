@@ -1,5 +1,5 @@
 # 데이터 처리를 위한 라이브러리 
-from datetime import datetime 
+from datetime import datetime, timedelta
 import json
 
 # m1 에서만 발생하는 requests.get() 
@@ -34,15 +34,21 @@ dag = DAG(
     
     # schedule_interval 변수를 기반으로 스케줄 간격을 정의할 수 있다. 
     # 디폴트 값은 None -> 수동실행 
-    schedule_interval="@daily",
-    # schedule_interval = None,
+    # schedule_interval = timedelta(minutes=3), # 3분 간격
 
-    # DAG 의 기본 옵션 
+    # schedule_interval="24 23 2 * *",
+    schedule_interval="@daily",
+    # schedule_interval = None
+    # schedule_interval = once   # 일회만
+    # schedule_interval = hourly # 매 시간
+
+
+    # DAG 의 기본 옵션
     default_args = default_args,
 
     # 해쉬태그 생각하면 편함, 찾기 쉽게 검색할 수 있음
-    tags=["naver", "search", "local", "api", "pipeline"],
-    catchup=False
+    tags    = ["naver", "search", "local", "api", "pipeline"],
+    catchup = False # backfilling - 과거시점 스케쥴링에 대한 부분 
 )
 
 creating_tabel = SqliteOperator(
@@ -144,7 +150,7 @@ store_result = BashOperator(
     # -e : 이스케이프 문자를 해석하도록 
     # \n 를 통해 sql 
     bash_command = 
-    'echo -e ".separator ", "\n.import /Users/airim/airflow/dags/data/naver_processed_result.csv naver_search_result" | sqlite3 /Users/airim/airflow/airflow.db',
+    'echo -e ".separator ", "\n.import /Users/ijaehwa/airflow/dags/data/naver_processed_result.csv naver_search_result" | sqlite3 /Users/ijaehwa/airflow/airflow.db',
     dag = dag 
 )
 
